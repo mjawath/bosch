@@ -1,0 +1,179 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /v1/enterprise-systems/:
+    put:
+      tags:
+      - enterprise systems
+      summary: "for an provided enterprise system with the provided id, update the\
+        \ information"
+      operationId: updateEnterpriseSystems
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnterpriseSystem'
+        required: true
+      responses:
+        "200":
+          description: OK
+    post:
+      tags:
+      - enterprise systems
+      summary: create an enterprise system
+      description: ' create an enterprise system'
+      operationId: addNewEnterpriseSystem
+      parameters:
+      - name: enterpriseSystemsCreateRequest
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/EnterpriseSystemsCreateRequest'
+      responses:
+        "200":
+          description: return the newly created enterprise system
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/EnterpriseSystemCreateResponse'
+        "400":
+          description: Invalid request provided
+        "500":
+          description: Internal server error occurred
+    delete:
+      tags:
+      - enterprise systems
+      summary: deletes an enterprise system with the provided id
+      operationId: deleteEnterpriseSystem
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: api will delete the provided enterprise system
+        "400":
+          description: Invalid request provided
+        "500":
+          description: Internal server error occurred
+  /v1/enterprise-systems/search:
+    post:
+      tags:
+      - enterprise systems
+      summary: "search an enterprise system, api will return a list of enterprise\
+        \ systems"
+      description: " search an enterprise system, api will return a list of enterprise\
+        \ systems"
+      operationId: findEnterpriseSystems
+      parameters:
+      - name: filter
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/SearchRequest'
+      responses:
+        "200":
+          description: api will return a list of enterprise systems
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SearchResultEnterpriseSystem'
+        "400":
+          description: Invalid request provided
+        "500":
+          description: Internal server error occurred
+  /v1/enterprise-systems/{id}:
+    get:
+      tags:
+      - enterprise systems
+      summary: returns an enterprise system with the provided id
+      operationId: getEnterpriseSystem
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: api will return a list of enterprise systems
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/EnterpriseSystem'
+        "400":
+          description: Invalid request provided
+        "500":
+          description: Internal server error occurred
+components:
+  schemas:
+    EnterpriseSystem:
+      required:
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        endpointUrl:
+          type: string
+        authmethod:
+          type: string
+    FilterElement:
+      type: object
+      properties:
+        attribute:
+          type: string
+        value:
+          type: string
+    SearchRequest:
+      type: object
+      properties:
+        filterBy:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterElement'
+        sortBy:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortElement'
+    SortElement:
+      type: object
+      properties:
+        attribute:
+          type: string
+        asc:
+          type: boolean
+    SearchResultEnterpriseSystem:
+      type: object
+      properties:
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnterpriseSystem'
+    EnterpriseSystemsCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        endpointUrl:
+          type: string
+        authMethod:
+          type: string
+    EnterpriseSystemCreateResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
