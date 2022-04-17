@@ -6,6 +6,7 @@
 package io.bosch.enterprisesystems.api;
 
 import io.bosch.enterprisesystems.api.dto.EnterpriseSystemCreateResponse;
+import io.bosch.enterprisesystems.api.dto.EnterpriseSystemResponse;
 import io.bosch.enterprisesystems.api.dto.EnterpriseSystemsCreateRequest;
 import io.bosch.enterprisesystems.model.EnterpriseSystem;
 import io.bosch.enterprisesystems.model.SearchRequest;
@@ -35,7 +36,7 @@ public interface EnterpriseSystemsApi {
             @ApiResponse(responseCode = "200", description = "api will return a list of enterprise systems"),
             @ApiResponse(responseCode = "400", description = "Invalid request provided", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error occurred", content = @Content) })
-    ResponseEntity<EnterpriseSystem> getEnterpriseSystem(@PathVariable("id") Long id);
+    ResponseEntity<EnterpriseSystemResponse> getEnterpriseSystem(@PathVariable("id") Long id);
 
     @Operation(summary = "search an enterprise system, api will return a list of enterprise systems" ,description = " search an enterprise system, api will return a list of enterprise systems", tags={ "enterprise systems" })
     @ApiResponses(value = {

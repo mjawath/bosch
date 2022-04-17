@@ -3,7 +3,7 @@ package contracts
 import org.springframework.cloud.contract.spec.Contract
 
 Contract.make {
-    description "should return person by id=1"
+    description "should return enterprise system by id=1"
 
     request {
         url "/v1/enterprise-systems/1"
@@ -17,7 +17,7 @@ Contract.make {
         }
         body (
                 id: 1,
-                name: "foo"
+                name: "Test"
         )
     }
 }

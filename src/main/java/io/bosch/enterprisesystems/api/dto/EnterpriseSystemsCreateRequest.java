@@ -2,7 +2,10 @@ package io.bosch.enterprisesystems.api.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * EnterpriseSystemsRequest
@@ -12,7 +15,9 @@ import lombok.Setter;
 @Setter
 public class EnterpriseSystemsCreateRequest {
 
+    @NotNull
     private String name;
+    @NotNull
     private String endpointUrl;
     private String authMethod;
 

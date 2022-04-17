@@ -1,6 +1,8 @@
 package io.bosch.enterprisesystems.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -12,7 +14,8 @@ import java.util.Objects;
  * SearchRequest
  */
 @Validated
-
+@Getter
+@Setter
 public class SearchRequest {
     @JsonProperty("filterBy")
     @Valid
@@ -35,10 +38,7 @@ public class SearchRequest {
         return this;
     }
 
-
-
     @Valid
-
     public List<FilterElement> getFilterBy() {
         return filterBy;
     }
@@ -60,9 +60,6 @@ public class SearchRequest {
         return this;
     }
 
-
-
-
     public List<SortElement> getSortBy() {
         return sortBy;
     }
@@ -70,7 +67,6 @@ public class SearchRequest {
     public void setSortBy(List<SortElement> sortBy) {
         this.sortBy = sortBy;
     }
-
 
     @Override
     public boolean equals(java.lang.Object o) {
