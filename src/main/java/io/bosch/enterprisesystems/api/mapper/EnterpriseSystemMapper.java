@@ -9,10 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class EnterpriseSystemMapper {
 
-    public EnterpriseSystem enterpriseSystemDtoToEnterpriseSystem(EnterpriseSystemDto enterpriseSystemDto) {
-        return EnterpriseSystem.builder().build();
-    }
-
     public EnterpriseSystemCreateResponse mapEntityToCreateResponse(EnterpriseSystem enterpriseSystem) {
         return EnterpriseSystemCreateResponse.builder()
                 .endpointUrl(enterpriseSystem.getEndpointUrl())

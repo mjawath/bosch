@@ -60,7 +60,7 @@ public class EnterpriseSystemsApiController implements EnterpriseSystemsApi {
         Optional<EnterpriseSystem> byId = enterpriseSystemService.getById(id);
         return byId.map((es) -> {
                     log.info("EnterpriseSystem {}  found ", es.getId());
-                    return ResponseEntity.ok(enterpriseSystemMapper.mapEntityToResponse(es))
+                    return ResponseEntity.ok(enterpriseSystemMapper.mapEntityToResponse(es));
                 })
                 .orElseGet(() -> {
                     log.info("item {} not found ", id);

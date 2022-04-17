@@ -1,6 +1,7 @@
 package io.bosch.enterprisesystems.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
@@ -14,6 +15,7 @@ import java.util.Objects;
  * SearchRequest
  */
 @Validated
+@Builder
 @Getter
 @Setter
 public class SearchRequest {

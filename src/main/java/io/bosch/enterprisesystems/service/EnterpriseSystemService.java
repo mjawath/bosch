@@ -12,7 +12,7 @@ public interface EnterpriseSystemService {
 
     EnterpriseSystem create(EnterpriseSystem request);
 
-    SearchResult search(SearchRequest request);
+    SearchResult<EnterpriseSystem> search(SearchRequest request);
 
     void delete(Long id);
 }

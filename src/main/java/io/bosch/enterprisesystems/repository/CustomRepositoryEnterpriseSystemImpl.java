@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CustomRepositoryEnterpriseSystemImpl implements EnterpriseSystemCustomRepository {
+public class CustomRepositoryEnterpriseSystemImpl {
     @Autowired
     private EntityManager entityManager;
-    @Override
+//    @Override
     public SearchResult<EnterpriseSystem> search(SearchRequest searchRequest) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -23,9 +23,11 @@ public class CustomRepositoryEnterpriseSystemImpl implements EnterpriseSystemCus
         List<Predicate> collect = searchRequest.getFilterBy().stream()
                 .map(filter -> cb.equal(incidentRoot.get(filter.getAttribute()), filter.getValue()))
                 .collect(Collectors.toList());
-        return entityManager.createQuery(criteriaQuery
+          entityManager.createQuery(criteriaQuery
                 .select(incidentRoot)
-                .where(collect)
-                .orderBy(cb.asc(createdAt))).getResultList();
+//                .where(collect)
+//                .orderBy(cb.asc()))
+         ).getResultList();
+        return  null;
     }
 }
