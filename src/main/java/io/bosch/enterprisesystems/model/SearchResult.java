@@ -13,5 +13,5 @@ import java.util.List;
 public class SearchResult<T> {
     private List<T> data;
     private Long numberOfRecords;
-    private Pageable pageable;
+    private Pageable page;
 }

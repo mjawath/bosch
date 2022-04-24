@@ -1,6 +1,5 @@
 package io.bosch.enterprisesystems.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +8,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * SearchRequest
@@ -19,13 +17,12 @@ import java.util.Objects;
 @Getter
 @Setter
 public class SearchRequest {
-    @JsonProperty("filterBy")
     @Valid
     private List<FilterElement> filterBy;
-
-    @JsonProperty("sortBy")
     @Valid
     private List<SortElement> sortBy;
+
+    private PageRequest pageable;
 
     public SearchRequest addFilterByItem(FilterElement filterByItem) {
         if (this.filterBy == null) {

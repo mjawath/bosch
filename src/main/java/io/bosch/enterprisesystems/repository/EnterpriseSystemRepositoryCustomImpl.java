@@ -5,9 +5,11 @@ import io.bosch.enterprisesystems.model.FilterElement;
 import io.bosch.enterprisesystems.model.SearchRequest;
 import io.bosch.enterprisesystems.model.SearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -31,13 +33,21 @@ public class EnterpriseSystemRepositoryCustomImpl implements EnterpriseSystemRep
             Long itemProjected = getCount(cb, null);
             return SearchResult.<EnterpriseSystem>builder().data(resultList).numberOfRecords(itemProjected).build();
         }
-        CriteriaQuery<EnterpriseSystem> fq = select.where(getPredicates(searchRequest.getFilterBy(), cb, root));
-        List<EnterpriseSystem> resultList = entityManager.createQuery(fq).getResultList();
 
         Long itemProjected = getCount(cb, searchRequest);
-
+        CriteriaQuery<EnterpriseSystem> fq = select.where(getPredicates(searchRequest.getFilterBy(), cb, root));
+        TypedQuery<EnterpriseSystem> query = entityManager.createQuery(fq);
+        int pageNumber = 0;
+        int pageSize = 10;//Todo from default environmental variable
+        if (searchRequest.getPageable() != null) {
+            pageNumber = searchRequest.getPageable().getPageNumber();
+            pageSize= searchRequest.getPageable().getPageSize();
+            query.setFirstResult((pageNumber - 1) * pageSize);
+            query.setMaxResults(pageSize);
+        }
+        List<EnterpriseSystem> resultList = query.getResultList();
         return SearchResult.<EnterpriseSystem>builder().data(resultList).numberOfRecords(itemProjected)
-//                .pageable( PageRequest.of())
+                .page(PageRequest.of(pageNumber, pageSize))
                 .build();
     }
 
