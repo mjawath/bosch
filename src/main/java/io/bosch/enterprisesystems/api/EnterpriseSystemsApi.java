@@ -38,13 +38,21 @@ public interface EnterpriseSystemsApi {
             @ApiResponse(responseCode = "500", description = "Internal server error occurred", content = @Content) })
     ResponseEntity<EnterpriseSystemResponse> getEnterpriseSystem(@PathVariable("id") Long id);
 
+    @Operation(summary = "returns an enterprise system ", tags={ "enterprise systems" })
+    @GetMapping(value = "/")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "api will return a list of enterprise systems"),
+            @ApiResponse(responseCode = "400", description = "Invalid request provided", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error occurred", content = @Content) })
+    ResponseEntity<SearchResult<EnterpriseSystem>>  getEnterpriseSystem();
+
     @Operation(summary = "search an enterprise system, api will return a list of enterprise systems" ,description = " search an enterprise system, api will return a list of enterprise systems", tags={ "enterprise systems" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "api will return a list of enterprise systems"),
             @ApiResponse(responseCode = "400", description = "Invalid request provided", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error occurred", content = @Content) })
     @PostMapping(value = "/search")
-    ResponseEntity<SearchResult<EnterpriseSystem>> findEnterpriseSystems(SearchRequest filter);
+    ResponseEntity<SearchResult<EnterpriseSystem>> findEnterpriseSystems(@RequestBody SearchRequest filter);
 
 
     @Operation(summary = "deletes an enterprise system with the provided id", tags={ "enterprise systems" })

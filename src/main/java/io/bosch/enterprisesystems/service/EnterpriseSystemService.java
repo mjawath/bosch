@@ -10,6 +10,8 @@ public interface EnterpriseSystemService {
 
     Optional<EnterpriseSystem> getById(Long id);
 
+    SearchResult<EnterpriseSystem> get();
+
     EnterpriseSystem create(EnterpriseSystem request);
 
     SearchResult<EnterpriseSystem> search(SearchRequest request);

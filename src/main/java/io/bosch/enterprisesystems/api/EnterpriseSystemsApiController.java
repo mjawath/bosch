@@ -68,6 +68,11 @@ public class EnterpriseSystemsApiController implements EnterpriseSystemsApi {
                 });
     }
 
+    public ResponseEntity<SearchResult<EnterpriseSystem>> getEnterpriseSystem() {
+        SearchResult search = enterpriseSystemService.search(null);
+        return ResponseEntity.ok(search);
+    }
+
     public ResponseEntity<Void> updateEnterpriseSystems(@RequestBody EnterpriseSystem body) {
         return new ResponseEntity(HttpStatus.NOT_IMPLEMENTED);
     }

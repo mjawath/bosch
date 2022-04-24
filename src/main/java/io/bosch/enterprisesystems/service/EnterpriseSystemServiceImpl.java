@@ -37,9 +37,12 @@ public class EnterpriseSystemServiceImpl implements EnterpriseSystemService {
     }
 
     @Override
+    public SearchResult<EnterpriseSystem> get() {
+        return enterpriseSystemRepository.search(null);
+    }
+    @Override
     public SearchResult<EnterpriseSystem> search(SearchRequest request) {
-//        return enterpriseSystemRepository.search(request);
-        return null;//todo search query
+        return enterpriseSystemRepository.search(request);
     }
 
     @Override
