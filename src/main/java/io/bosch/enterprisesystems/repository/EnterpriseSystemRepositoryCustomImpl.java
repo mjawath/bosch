@@ -41,7 +41,7 @@ public class EnterpriseSystemRepositoryCustomImpl implements EnterpriseSystemRep
         int pageSize = 10;//Todo from default environmental variable
         if (searchRequest.getPageable() != null) {
             pageNumber = searchRequest.getPageable().getPageNumber();
-            pageSize= searchRequest.getPageable().getPageSize();
+            pageSize = searchRequest.getPageable().getPageSize();
             query.setFirstResult((pageNumber - 1) * pageSize);
             query.setMaxResults(pageSize);
         }

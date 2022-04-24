@@ -33,7 +33,6 @@ public class SearchRequest {
     }
 
 
-
     public SearchRequest addSortByItem(SortElement sortByItem) {
         if (this.sortBy == null) {
             this.sortBy = new ArrayList<SortElement>();

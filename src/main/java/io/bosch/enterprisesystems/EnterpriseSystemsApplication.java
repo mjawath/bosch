@@ -23,7 +23,7 @@ public class EnterpriseSystemsApplication implements CommandLineRunner {
         new SpringApplication(EnterpriseSystemsApplication.class).run(args);
     }
 
-//    @Configuration
+    //    @Configuration
     static class MyConfig extends WebMvcConfigurerAdapter {
         @Override
         public void addFormatters(FormatterRegistry registry) {

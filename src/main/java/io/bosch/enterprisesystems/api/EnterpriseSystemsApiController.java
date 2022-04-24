@@ -51,7 +51,7 @@ public class EnterpriseSystemsApiController implements EnterpriseSystemsApi {
 
 
     public ResponseEntity<SearchResult<EnterpriseSystem>> findEnterpriseSystems(SearchRequest filter) {
-        SearchResult search = enterpriseSystemService.search(filter);
+        SearchResult<EnterpriseSystem> search = enterpriseSystemService.search(filter);
         return ResponseEntity.ok(search);
     }
 
@@ -69,7 +69,7 @@ public class EnterpriseSystemsApiController implements EnterpriseSystemsApi {
     }
 
     public ResponseEntity<SearchResult<EnterpriseSystem>> getEnterpriseSystem() {
-        SearchResult search = enterpriseSystemService.search(null);
+        SearchResult<EnterpriseSystem> search = enterpriseSystemService.search(null);
         return ResponseEntity.ok(search);
     }
 
@@ -79,6 +79,6 @@ public class EnterpriseSystemsApiController implements EnterpriseSystemsApi {
 
     public ResponseEntity<Void> deleteEnterpriseSystem(@PathVariable("id") Long id) {
         enterpriseSystemService.delete(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return ResponseEntity.noContent().build();
     }
 }

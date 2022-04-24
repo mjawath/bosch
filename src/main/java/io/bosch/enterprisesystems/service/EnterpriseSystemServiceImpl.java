@@ -1,18 +1,12 @@
 package io.bosch.enterprisesystems.service;
 
+import io.bosch.enterprisesystems.api.mapper.EnterpriseSystemMapper;
 import io.bosch.enterprisesystems.model.EnterpriseSystem;
 import io.bosch.enterprisesystems.model.SearchRequest;
 import io.bosch.enterprisesystems.model.SearchResult;
 import io.bosch.enterprisesystems.repository.EnterpriseSystemRepository;
-import io.bosch.enterprisesystems.api.mapper.EnterpriseSystemMapper;
-import org.springframework.data.domain.Example;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import java.util.Optional;
 
 @Component
@@ -40,6 +34,7 @@ public class EnterpriseSystemServiceImpl implements EnterpriseSystemService {
     public SearchResult<EnterpriseSystem> get() {
         return enterpriseSystemRepository.search(null);
     }
+
     @Override
     public SearchResult<EnterpriseSystem> search(SearchRequest request) {
         return enterpriseSystemRepository.search(request);
