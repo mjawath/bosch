@@ -29,14 +29,14 @@ public class EnterpriseSystemRepositoryCustomImpl implements EnterpriseSystemRep
         if (searchRequest == null) {
             List<EnterpriseSystem> resultList = entityManager.createQuery(select).getResultList();
             Long itemProjected = getCount(cb, null);
-            return SearchResult.<EnterpriseSystem>builder().list(resultList).numberOfRecords(itemProjected).build();
+            return SearchResult.<EnterpriseSystem>builder().data(resultList).numberOfRecords(itemProjected).build();
         }
         CriteriaQuery<EnterpriseSystem> fq = select.where(getPredicates(searchRequest.getFilterBy(), cb, root));
         List<EnterpriseSystem> resultList = entityManager.createQuery(fq).getResultList();
 
         Long itemProjected = getCount(cb, searchRequest);
 
-        return SearchResult.<EnterpriseSystem>builder().list(resultList).numberOfRecords(itemProjected)
+        return SearchResult.<EnterpriseSystem>builder().data(resultList).numberOfRecords(itemProjected)
 //                .pageable( PageRequest.of())
                 .build();
     }

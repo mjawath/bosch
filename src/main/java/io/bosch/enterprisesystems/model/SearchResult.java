@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 public class SearchResult<T> {
-    private List<T> list;
+    private List<T> data;
     private Long numberOfRecords;
     private Pageable pageable;
 }
