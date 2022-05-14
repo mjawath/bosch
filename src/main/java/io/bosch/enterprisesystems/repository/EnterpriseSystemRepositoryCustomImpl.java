@@ -5,7 +5,6 @@ import io.bosch.enterprisesystems.model.FilterElement;
 import io.bosch.enterprisesystems.model.SearchRequest;
 import io.bosch.enterprisesystems.model.SearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -23,20 +22,33 @@ public class EnterpriseSystemRepositoryCustomImpl implements EnterpriseSystemRep
 
     //    @Override
     public SearchResult<EnterpriseSystem> search(SearchRequest searchRequest) {
+
+        if (searchRequest == null || searchRequest.getFilterBy() == null || searchRequest.getFilterBy().isEmpty()) {
+            return searchWithout(searchRequest);
+        }
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<EnterpriseSystem> criteriaQuery = cb.createQuery(EnterpriseSystem.class);
         Root<EnterpriseSystem> root = criteriaQuery.from(EnterpriseSystem.class);
-
+        List<FilterElement> filterBy = searchRequest.getFilterBy();
         CriteriaQuery<EnterpriseSystem> select = criteriaQuery.select(root);
-        if (searchRequest == null) {
-            List<EnterpriseSystem> resultList = entityManager.createQuery(select).getResultList();
-            Long itemProjected = getCount(cb, null);
-            return SearchResult.<EnterpriseSystem>builder().data(resultList).numberOfRecords(itemProjected).build();
-        }
-
-        Long itemProjected = getCount(cb, searchRequest);
-        CriteriaQuery<EnterpriseSystem> fq = select.where(getPredicates(searchRequest.getFilterBy(), cb, root));
+        CriteriaQuery<EnterpriseSystem> fq = select.where(getPredicates(filterBy, cb, root));
         TypedQuery<EnterpriseSystem> query = entityManager.createQuery(fq);
+//        List<EnterpriseSystem> resultList = applyPaging(searchRequest, query);
+        Long itemProjected = getCount(cb, searchRequest);
+//        PageRequest page = PageRequest.of(pageNumber, pageSize);
+        return applyPaging(searchRequest, query, itemProjected);
+    }
+
+    private SearchResult<EnterpriseSystem> searchWithout(SearchRequest searchRequest) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<EnterpriseSystem> criteriaQuery = cb.createQuery(EnterpriseSystem.class);
+        Root<EnterpriseSystem> root = criteriaQuery.from(EnterpriseSystem.class);
+        CriteriaQuery<EnterpriseSystem> select = criteriaQuery.select(root);
+        Long count = getCount(cb, null);
+        return applyPaging(searchRequest, entityManager.createQuery(select), count);
+    }
+
+    private SearchResult<EnterpriseSystem> applyPaging(SearchRequest searchRequest, TypedQuery<EnterpriseSystem> query, long itemProjected) {
         int pageNumber = 0;
         int pageSize = 10;//Todo from default environmental variable
         if (searchRequest.getPageable() != null) {
@@ -46,9 +58,7 @@ public class EnterpriseSystemRepositoryCustomImpl implements EnterpriseSystemRep
             query.setMaxResults(pageSize);
         }
         List<EnterpriseSystem> resultList = query.getResultList();
-        return SearchResult.<EnterpriseSystem>builder().data(resultList).numberOfRecords(itemProjected)
-                .page(PageRequest.of(pageNumber, pageSize))
-                .build();
+        return new SearchResult<>(resultList, searchRequest.getPageable(), itemProjected);
     }
 
     private Long getCount(CriteriaBuilder cb, SearchRequest searchRequest) {

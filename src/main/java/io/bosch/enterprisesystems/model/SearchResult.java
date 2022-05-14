@@ -1,17 +1,18 @@
 package io.bosch.enterprisesystems.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-@Builder
-@Getter
-@Setter
-public class SearchResult<T> {
-    private List<T> data;
-    private Long numberOfRecords;
-    private Pageable page;
+public class SearchResult<T> extends PageImpl<T> {
+    private long count;// total result count is wrong
+    public SearchResult(List<T> content, Pageable pageable, long total) {
+        super(content, pageable, total);
+        this.count=total;
+    }
+
+    public long getCount() {
+        return count;
+    }
 }
