@@ -14,7 +14,7 @@ public class SortElement {
     private String attribute = null;
 
     @JsonProperty("asc")
-    private Boolean asc = null;
+    private boolean asc;
 
     public SortElement attribute(String attribute) {
         this.attribute = attribute;

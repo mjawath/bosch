@@ -1,9 +1,6 @@
 package io.bosch.enterprisesystems.repository;
 
-import io.bosch.enterprisesystems.model.EnterpriseSystem;
-import io.bosch.enterprisesystems.model.FilterElement;
-import io.bosch.enterprisesystems.model.SearchRequest;
-import io.bosch.enterprisesystems.model.SearchResult;
+import io.bosch.enterprisesystems.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
@@ -15,6 +12,8 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class EnterpriseSystemRepositoryCustomImpl implements EnterpriseSystemRepositoryCustom {
     @Autowired
@@ -24,7 +23,7 @@ public class EnterpriseSystemRepositoryCustomImpl implements EnterpriseSystemRep
     public SearchResult<EnterpriseSystem> search(SearchRequest searchRequest) {
 
         if (searchRequest == null || searchRequest.getFilterBy() == null || searchRequest.getFilterBy().isEmpty()) {
-            return searchWithout(searchRequest);
+            return searchWithoutFilter(searchRequest);
         }
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<EnterpriseSystem> criteriaQuery = cb.createQuery(EnterpriseSystem.class);
@@ -33,19 +32,28 @@ public class EnterpriseSystemRepositoryCustomImpl implements EnterpriseSystemRep
         CriteriaQuery<EnterpriseSystem> select = criteriaQuery.select(root);
         CriteriaQuery<EnterpriseSystem> fq = select.where(getPredicates(filterBy, cb, root));
         TypedQuery<EnterpriseSystem> query = entityManager.createQuery(fq);
-//        List<EnterpriseSystem> resultList = applyPaging(searchRequest, query);
         Long itemProjected = getCount(cb, searchRequest);
-//        PageRequest page = PageRequest.of(pageNumber, pageSize);
         return applyPaging(searchRequest, query, itemProjected);
     }
 
-    private SearchResult<EnterpriseSystem> searchWithout(SearchRequest searchRequest) {
+    private SearchResult<EnterpriseSystem> searchWithoutFilter(SearchRequest searchRequest) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<EnterpriseSystem> criteriaQuery = cb.createQuery(EnterpriseSystem.class);
         Root<EnterpriseSystem> root = criteriaQuery.from(EnterpriseSystem.class);
         CriteriaQuery<EnterpriseSystem> select = criteriaQuery.select(root);
         Long count = getCount(cb, null);
-        return applyPaging(searchRequest, entityManager.createQuery(select), count);
+        List<SortElement> sortBy = searchRequest.getSortBy();
+//        Sort.by(Sort.Direction.ASC, "seatNumber")
+        return applyPaging(searchRequest, entityManager.createQuery(
+                Optional.ofNullable(sortBy)
+                        .map(it -> criteriaQuery
+                                .orderBy(it
+                                        .stream()
+                                        .map(t -> t.isAsc() ?
+                                                cb.asc(root.get(t.getAttribute())):
+                                                cb.desc(root.get(t.getAttribute())))
+                                        .collect(Collectors.toList())))
+                        .orElse(select)), count);
     }
 
     private SearchResult<EnterpriseSystem> applyPaging(SearchRequest searchRequest, TypedQuery<EnterpriseSystem> query, long itemProjected) {
