@@ -21,66 +21,56 @@ public class EnterpriseSystemRepositoryCustomImpl implements EnterpriseSystemRep
 
     //    @Override
     public SearchResult<EnterpriseSystem> search(SearchRequest searchRequest) {
-
-        if (searchRequest == null || searchRequest.getFilterBy() == null || searchRequest.getFilterBy().isEmpty()) {
-            return searchWithoutFilter(searchRequest);
-        }
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<EnterpriseSystem> criteriaQuery = cb.createQuery(EnterpriseSystem.class);
-        Root<EnterpriseSystem> root = criteriaQuery.from(EnterpriseSystem.class);
-        List<FilterElement> filterBy = searchRequest.getFilterBy();
-        CriteriaQuery<EnterpriseSystem> select = criteriaQuery.select(root);
-        CriteriaQuery<EnterpriseSystem> fq = select.where(getPredicates(filterBy, cb, root));
-        Long itemProjected = getCount(cb, searchRequest);
-        return applyPaging(searchRequest, getQuery(searchRequest,cb,criteriaQuery,root,fq), itemProjected);
+        Long itemProjected = getCount(searchRequest);
+        return applyPaging(searchRequest, itemProjected);
     }
 
-    private SearchResult<EnterpriseSystem> searchWithoutFilter(SearchRequest searchRequest) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<EnterpriseSystem> criteriaQuery = cb.createQuery(EnterpriseSystem.class);
+    private TypedQuery<EnterpriseSystem> getQuery(SearchRequest searchRequest) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<EnterpriseSystem> criteriaQuery = criteriaBuilder.createQuery(EnterpriseSystem.class);
         Root<EnterpriseSystem> root = criteriaQuery.from(EnterpriseSystem.class);
         CriteriaQuery<EnterpriseSystem> select = criteriaQuery.select(root);
-        Long count = getCount(cb, null);
-        return applyPaging(searchRequest, getQuery(searchRequest,cb, criteriaQuery, root, select), count);
-    }
-
-    private TypedQuery<EnterpriseSystem> getQuery(SearchRequest searchRequest, CriteriaBuilder cb, CriteriaQuery<EnterpriseSystem> criteriaQuery, Root<EnterpriseSystem> root, CriteriaQuery<EnterpriseSystem> select) {
-        List<SortElement> sortBy = searchRequest.getSortBy();
+        CriteriaQuery<EnterpriseSystem> where = Optional.ofNullable(searchRequest).map(SearchRequest::getFilterBy)
+                .map(it -> select.where(getPredicates(it, criteriaBuilder, root)))
+                .orElse(select);
         return entityManager.createQuery(
-                Optional.ofNullable(sortBy)
-                        .map(it -> criteriaQuery
+                Optional.ofNullable(searchRequest).map(SearchRequest::getSortBy)
+                        .map(it -> where
                                 .orderBy(it
                                         .stream()
                                         .map(t -> t.isAsc() ?
-                                                cb.asc(root.get(t.getAttribute())) :
-                                                cb.desc(root.get(t.getAttribute())))
+                                                criteriaBuilder.asc(root.get(t.getAttribute())) :
+                                                criteriaBuilder.desc(root.get(t.getAttribute())))
                                         .collect(Collectors.toList())))
-                        .orElse(select));
+                        .orElse(where));
     }
 
-    private SearchResult<EnterpriseSystem> applyPaging(SearchRequest searchRequest, TypedQuery<EnterpriseSystem> query, long itemProjected) {
-        int pageNumber = 0;
-        int pageSize = 10;//Todo from default environmental variable
-        if (searchRequest.getPageable() != null) {
+    private SearchResult<EnterpriseSystem> applyPaging(SearchRequest searchRequest, long itemProjected) {
+        TypedQuery<EnterpriseSystem> query = getQuery(searchRequest);
+
+        Optional.ofNullable(searchRequest).map(SearchRequest::getPageable).ifPresent(it->{
+            int pageNumber = 0;
+            int pageSize = 10;//Todo from default environmental variable
             pageNumber = searchRequest.getPageable().getPageNumber();
             pageSize = searchRequest.getPageable().getPageSize();
             query.setFirstResult((pageNumber - 1) * pageSize);
             query.setMaxResults(pageSize);
-        }
+        });
         List<EnterpriseSystem> resultList = query.getResultList();
-        return new SearchResult<>(resultList, searchRequest.getPageable(), itemProjected);
+        return new SearchResult<>(resultList,   Optional.ofNullable(searchRequest)
+                .map(SearchRequest::getPageable)
+                .orElse(new PageRequest(1,resultList.size())), itemProjected);
     }
 
-    private Long getCount(CriteriaBuilder cb, SearchRequest searchRequest) {
-        CriteriaQuery<Long> cr = cb.createQuery(Long.class);
-        Root<EnterpriseSystem> rootx = cr.from(EnterpriseSystem.class);
-        if (searchRequest == null) {
-            cr.select(cb.count(rootx));
-        } else {
-            List<FilterElement> filterBy = searchRequest.getFilterBy();
-            cr.select(cb.count(rootx)).where(getPredicates(filterBy, cb, rootx));
-        }
-        Query query = entityManager.createQuery(cr);
+    private Long getCount(SearchRequest searchRequest) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+        Root<EnterpriseSystem> root = criteriaQuery.from(EnterpriseSystem.class);
+        CriteriaQuery<Long> select = criteriaQuery.select(criteriaBuilder.count(root));
+        CriteriaQuery<Long> where = Optional.ofNullable(searchRequest).map(SearchRequest::getFilterBy)
+                .map(it -> select.where(getPredicates(it, criteriaBuilder, root)))
+                .orElse(select);
+        Query query = entityManager.createQuery(where);
         return (Long) query.getSingleResult();
     }
 
