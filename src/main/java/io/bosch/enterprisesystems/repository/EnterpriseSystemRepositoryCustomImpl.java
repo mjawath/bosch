@@ -31,9 +31,8 @@ public class EnterpriseSystemRepositoryCustomImpl implements EnterpriseSystemRep
         List<FilterElement> filterBy = searchRequest.getFilterBy();
         CriteriaQuery<EnterpriseSystem> select = criteriaQuery.select(root);
         CriteriaQuery<EnterpriseSystem> fq = select.where(getPredicates(filterBy, cb, root));
-        TypedQuery<EnterpriseSystem> query = entityManager.createQuery(fq);
         Long itemProjected = getCount(cb, searchRequest);
-        return applyPaging(searchRequest, query, itemProjected);
+        return applyPaging(searchRequest, getQuery(searchRequest,cb,criteriaQuery,root,fq), itemProjected);
     }
 
     private SearchResult<EnterpriseSystem> searchWithoutFilter(SearchRequest searchRequest) {
@@ -42,18 +41,21 @@ public class EnterpriseSystemRepositoryCustomImpl implements EnterpriseSystemRep
         Root<EnterpriseSystem> root = criteriaQuery.from(EnterpriseSystem.class);
         CriteriaQuery<EnterpriseSystem> select = criteriaQuery.select(root);
         Long count = getCount(cb, null);
+        return applyPaging(searchRequest, getQuery(searchRequest,cb, criteriaQuery, root, select), count);
+    }
+
+    private TypedQuery<EnterpriseSystem> getQuery(SearchRequest searchRequest, CriteriaBuilder cb, CriteriaQuery<EnterpriseSystem> criteriaQuery, Root<EnterpriseSystem> root, CriteriaQuery<EnterpriseSystem> select) {
         List<SortElement> sortBy = searchRequest.getSortBy();
-//        Sort.by(Sort.Direction.ASC, "seatNumber")
-        return applyPaging(searchRequest, entityManager.createQuery(
+        return entityManager.createQuery(
                 Optional.ofNullable(sortBy)
                         .map(it -> criteriaQuery
                                 .orderBy(it
                                         .stream()
                                         .map(t -> t.isAsc() ?
-                                                cb.asc(root.get(t.getAttribute())):
+                                                cb.asc(root.get(t.getAttribute())) :
                                                 cb.desc(root.get(t.getAttribute())))
                                         .collect(Collectors.toList())))
-                        .orElse(select)), count);
+                        .orElse(select));
     }
 
     private SearchResult<EnterpriseSystem> applyPaging(SearchRequest searchRequest, TypedQuery<EnterpriseSystem> query, long itemProjected) {
