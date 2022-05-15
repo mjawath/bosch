@@ -30,19 +30,26 @@ public class EnterpriseSystemRepositoryCustomImpl implements EnterpriseSystemRep
         CriteriaQuery<EnterpriseSystem> criteriaQuery = criteriaBuilder.createQuery(EnterpriseSystem.class);
         Root<EnterpriseSystem> root = criteriaQuery.from(EnterpriseSystem.class);
         CriteriaQuery<EnterpriseSystem> select = criteriaQuery.select(root);
-        CriteriaQuery<EnterpriseSystem> where = Optional.ofNullable(searchRequest).map(SearchRequest::getFilterBy)
+        CriteriaQuery<EnterpriseSystem> where = applyFilter(searchRequest, criteriaBuilder, root, select);
+        return entityManager.createQuery(applySorts(searchRequest, criteriaBuilder, root, where));
+    }
+
+    private CriteriaQuery<EnterpriseSystem> applySorts(SearchRequest searchRequest, CriteriaBuilder criteriaBuilder, Root<EnterpriseSystem> root, CriteriaQuery<EnterpriseSystem> where) {
+        return Optional.ofNullable(searchRequest).map(SearchRequest::getSortBy)
+                .map(it -> where
+                        .orderBy(it
+                                .stream()
+                                .map(t -> t.isAsc() ?
+                                        criteriaBuilder.asc(root.get(t.getAttribute())) :
+                                        criteriaBuilder.desc(root.get(t.getAttribute())))
+                                .collect(Collectors.toList())))
+                .orElse(where);
+    }
+
+    private CriteriaQuery applyFilter(SearchRequest searchRequest, CriteriaBuilder criteriaBuilder, Root root, CriteriaQuery select) {
+        return Optional.ofNullable(searchRequest).map(SearchRequest::getFilterBy)
                 .map(it -> select.where(getPredicates(it, criteriaBuilder, root)))
                 .orElse(select);
-        return entityManager.createQuery(
-                Optional.ofNullable(searchRequest).map(SearchRequest::getSortBy)
-                        .map(it -> where
-                                .orderBy(it
-                                        .stream()
-                                        .map(t -> t.isAsc() ?
-                                                criteriaBuilder.asc(root.get(t.getAttribute())) :
-                                                criteriaBuilder.desc(root.get(t.getAttribute())))
-                                        .collect(Collectors.toList())))
-                        .orElse(where));
     }
 
     private SearchResult<EnterpriseSystem> applyPaging(SearchRequest searchRequest, long itemProjected) {
@@ -67,9 +74,7 @@ public class EnterpriseSystemRepositoryCustomImpl implements EnterpriseSystemRep
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<EnterpriseSystem> root = criteriaQuery.from(EnterpriseSystem.class);
         CriteriaQuery<Long> select = criteriaQuery.select(criteriaBuilder.count(root));
-        CriteriaQuery<Long> where = Optional.ofNullable(searchRequest).map(SearchRequest::getFilterBy)
-                .map(it -> select.where(getPredicates(it, criteriaBuilder, root)))
-                .orElse(select);
+        CriteriaQuery<Long> where = applyFilter(searchRequest, criteriaBuilder, root, select);
         Query query = entityManager.createQuery(where);
         return (Long) query.getSingleResult();
     }
