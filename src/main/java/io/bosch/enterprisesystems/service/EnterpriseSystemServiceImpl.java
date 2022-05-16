@@ -5,6 +5,7 @@ import io.bosch.enterprisesystems.model.EnterpriseSystem;
 import io.bosch.enterprisesystems.model.SearchRequest;
 import io.bosch.enterprisesystems.model.SearchResult;
 import io.bosch.enterprisesystems.repository.EnterpriseSystemRepository;
+import io.bosch.enterprisesystems.repository.GenericCustomSearchDAO;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -14,10 +15,12 @@ public class EnterpriseSystemServiceImpl implements EnterpriseSystemService {
 
     private final EnterpriseSystemRepository enterpriseSystemRepository;
     private final EnterpriseSystemMapper mapper;
+    private final GenericCustomSearchDAO customSearchDAO;
 
-    public EnterpriseSystemServiceImpl(EnterpriseSystemRepository enterpriseSystemRepository, EnterpriseSystemMapper mapper) {
+    public EnterpriseSystemServiceImpl(EnterpriseSystemRepository enterpriseSystemRepository, EnterpriseSystemMapper mapper, GenericCustomSearchDAO customSearchDAO) {
         this.enterpriseSystemRepository = enterpriseSystemRepository;
         this.mapper = mapper;
+        this.customSearchDAO = customSearchDAO;
     }
 
     @Override
@@ -32,12 +35,12 @@ public class EnterpriseSystemServiceImpl implements EnterpriseSystemService {
 
     @Override
     public SearchResult<EnterpriseSystem> get() {
-        return enterpriseSystemRepository.search(null);
+        return customSearchDAO.search(null);
     }
 
     @Override
     public SearchResult<EnterpriseSystem> search(SearchRequest request) {
-        return enterpriseSystemRepository.search(request);
+        return customSearchDAO.search(request);
     }
 
     @Override
